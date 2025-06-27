@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaPowerOff, FaVolumeUp, FaVolumeDown, FaChevronUp, FaChevronDown, FaChevronLeft, FaChevronRight, FaRegCircle, FaPlay, FaPause, FaStop, FaYoutube, FaArrowLeft, FaArrowRight, FaArrowUp, FaArrowDown, FaMicrophone, FaTv, FaTh, FaListUl, FaRegSquare, FaRegDotCircle, FaStepBackward, FaStepForward, FaCircle } from "react-icons/fa";
 import { MdMenu, MdSubtitles, MdTextFields, MdSettingsVoice } from "react-icons/md";
 import { IoMdReturnLeft } from "react-icons/io";
+import { useTVControl } from '../context/TVControlContext';
 
 const buttonMap = [
   // Верхний ряд
@@ -89,10 +90,30 @@ const buttonMap = [
 
 export default function RemoteControl({ onButtonClick }: { onButtonClick?: (key: string) => void }) {
   const [pressed, setPressed] = useState<string | null>(null);
+  const { sendCommand } = useTVControl();
 
   const handlePress = (key: string) => {
     setPressed(key);
     if (onButtonClick) onButtonClick(key);
+    // Управление ТВ с пульта
+    switch (key) {
+      case 'power':
+        sendCommand('power'); break;
+      case 'ok':
+        sendCommand('ok'); break;
+      case 'exit':
+        sendCommand('exit'); break;
+      case 'up':
+        sendCommand('up'); break;
+      case 'down':
+        sendCommand('down'); break;
+      case 'left':
+        sendCommand('left'); break;
+      case 'right':
+        sendCommand('right'); break;
+      default:
+        break;
+    }
     setTimeout(() => setPressed(null), 150);
   };
 
