@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import SelectDevicePage from "./pages/SelectDevicePage";
 import DeviceRemotePage from "./pages/DeviceRemotePage";
 import { TVControlProvider, useTVControl } from './context/TVControlContext';
+import TVScreen from './components/TVScreen';
+import RemoteControl from './components/RemoteControl';
 
 const queryClient = new QueryClient();
 
@@ -51,26 +53,35 @@ function TVKeyboardHandler({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-const App = () => (
-  <TVControlProvider>
-    <TVKeyboardHandler>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/select-device" element={<SelectDevicePage />} />
-              <Route path="/device/:deviceId" element={<DeviceRemotePage />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </TVKeyboardHandler>
-  </TVControlProvider>
-);
+export default function App() {
+  const [panelBtnFromRemote, setPanelBtnFromRemote] = useState<number | null>(null);
 
-export default App;
+  // Обработчик для виртуального пульта
+  function handleRemoteButton(key: string) {
+    if (["1","2","3","4","5"].includes(key)) {
+      setPanelBtnFromRemote(Number(key));
+    }
+  }
+
+  return (
+    <TVControlProvider>
+      <TVKeyboardHandler>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/select-device" element={<SelectDevicePage />} />
+                <Route path="/device/:deviceId" element={<DeviceRemotePage />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </TVKeyboardHandler>
+    </TVControlProvider>
+  );
+}

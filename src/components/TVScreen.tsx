@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaYoutube, FaCog, FaWifi, FaCloud, FaTv, FaAppStore, FaInfoCircle, FaMagic, FaSatelliteDish, FaCogs } from "react-icons/fa";
 import { MdSettings, MdApps, MdUpdate, MdInfo, MdNetworkWifi } from "react-icons/md";
 import { useTVControl, CHANNEL_EDITOR_ITEMS_LIST } from '../context/TVControlContext';
@@ -30,8 +30,30 @@ const apps = [
   { name: "Информация", icon: <MdInfo color="#fff" size={28} /> },
 ];
 
-export default function TVScreen() {
+export default function TVScreen({ panelBtnFromRemote }: { panelBtnFromRemote?: number | null }) {
   const { tvState } = useTVControl();
+  const [activePanelBtn, setActivePanelBtn] = useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (panelBtnFromRemote && tvState.channelListOpen) {
+      setActivePanelBtn(panelBtnFromRemote);
+    }
+  }, [panelBtnFromRemote, tvState.channelListOpen]);
+
+  React.useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (!tvState.channelListOpen) return;
+      if (["1", "2", "3", "4", "5"].includes(e.key)) {
+        setActivePanelBtn(Number(e.key));
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [tvState.channelListOpen]);
+
+  function handlePanelBtnClick(idx: number) {
+    setActivePanelBtn(idx + 1);
+  }
 
   const now = new Date();
   const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '/');
@@ -94,32 +116,64 @@ export default function TVScreen() {
               {/* Основной flex-контейнер модалки */}
               <div style={{ display: 'flex', flexDirection: 'row', flex: 1, minHeight: 120, background: '#102040' }}>
                 {/* Левая колонка: панель 1-5 и список */}
-                <div style={{ flex: 2, minWidth: 120, display: 'flex', flexDirection: 'column', alignItems: 'stretch', padding: '10px 0 10px 12px', background: 'rgba(0,0,0,0.04)', borderRight: '1.5px solid #174080' }}>
+                <div style={{ flex: 2, minWidth: 240, display: 'flex', flexDirection: 'column', alignItems: 'stretch', padding: '10px 0 10px 12px', background: 'rgba(0,0,0,0.04)', borderRight: '1.5px solid #174080' }}>
                   {/* Панель 1-5 */}
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     background: '#001a3a',
-                    borderRadius: 7,
-                    padding: '2px 5px',
+                    borderRadius: 6,
+                    padding: '1.5px 2.5px',
                     justifyContent: 'center',
-                    fontSize: 11,
+                    fontSize: 9,
                     color: '#fff',
-                    margin: '0 0 6px 0',
-                    gap: 7,
+                    margin: '0 0 5px 0',
+                    gap: 3,
                     border: '1px solid #174080',
-                    maxWidth: 140,
-                    minWidth: 0,
+                    maxWidth: 220,
+                    width: '94%',
                     alignSelf: 'flex-start',
                   }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 1 }}><span style={{ color: '#fff', fontWeight: 700, fontSize: 11 }}>1</span> <span style={{ fontSize: 11 }}>🗑️</span> <span style={{ fontSize: 10 }}>Del</span></span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 1 }}><span style={{ color: '#fff', fontWeight: 700, fontSize: 11 }}>2</span> <span style={{ fontSize: 11 }}>↔️</span> <span style={{ fontSize: 10 }}>Move</span></span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 1 }}><span style={{ color: '#fff', fontWeight: 700, fontSize: 11 }}>3</span> <span style={{ fontSize: 11 }}>⏭️</span> <span style={{ fontSize: 10 }}>Skip</span></span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 1 }}><span style={{ color: '#fff', fontWeight: 700, fontSize: 11 }}>4</span> <span style={{ fontSize: 11 }}>🔒</span> <span style={{ fontSize: 10 }}>Lock</span></span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 1 }}><span style={{ color: '#fff', fontWeight: 700, fontSize: 11 }}>5</span> <span style={{ fontSize: 11, color: '#ffd600' }}>★</span> <span style={{ fontSize: 10 }}>Fav</span></span>
+                    {[1,2,3,4,5].map((num, idx) => (
+                      <button
+                        key={num}
+                        type="button"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          background: 'none',
+                          border: activePanelBtn === num ? '2px solid #ffd600' : 'none',
+                          color: '#fff',
+                          fontWeight: 700,
+                          fontSize: 9,
+                          padding: '2px 4px',
+                          borderRadius: 4,
+                          cursor: 'pointer',
+                          transition: 'background 0.15s, border 0.15s',
+                          boxShadow: activePanelBtn === num ? '0 0 0 2px #ffd60088' : undefined,
+                        }}
+                        onClick={() => handlePanelBtnClick(idx)}
+                      >
+                        <span>{num}</span>
+                        <span style={{ fontSize: 10 }}>{["🗑️","↔️","⏭️","🔒","★"][idx]}</span>
+                        <span style={{ fontSize: 8, fontWeight: 400 }}>{["Del","Move","Skip","Lock","Fav"][idx]}</span>
+                      </button>
+                    ))}
                   </div>
                   <div style={{ color: '#fff', fontSize: 13, marginBottom: 4, fontWeight: 500, marginTop: 2 }}>Все</div>
-                  <div style={{ background: '#001a3a', borderRadius: 7, padding: 3, minHeight: 80, maxHeight: 120, overflowY: 'auto', border: '1px solid #174080' }}>
+                  <div style={{
+                    background: '#001a3a',
+                    borderRadius: 7,
+                    padding: 3,
+                    minHeight: 80,
+                    maxHeight: 120,
+                    overflowY: 'auto',
+                    border: '1px solid #174080',
+                    width: 210,
+                    transition: 'width 0.2s',
+                    scrollbarWidth: 'thin',
+                  }}>
                     {tvState.channelList.map((ch, idx) => (
                       <div
                         key={ch.name}
@@ -134,10 +188,16 @@ export default function TVScreen() {
                           display: 'flex',
                           alignItems: 'center',
                           letterSpacing: 0.1,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          width: 180,
+                          transition: 'background 0.15s',
+                          cursor: 'pointer',
                         }}
                       >
                         <span style={{ width: 18, display: 'inline-block', textAlign: 'right', marginRight: 6 }}>{idx + 1}</span>
-                        <span>{ch.name}</span>
+                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: 155, display: 'inline-block' }}>{ch.name}</span>
                       </div>
                     ))}
                   </div>
@@ -152,7 +212,7 @@ export default function TVScreen() {
                     </div>
                   </div>
                   {/* Инфо о канале */}
-                  <div style={{ color: '#fff', fontSize: 12, background: '#001a3a', borderRadius: 5, padding: '8px 12px', minHeight: 40, width: 170, whiteSpace: 'pre-line', marginTop: 6, border: '1px solid #174080' }}>
+                  <div style={{ color: '#fff', fontSize: 12, background: '#001a3a', borderRadius: 5, padding: '8px 12px', minHeight: 40, width: 155, whiteSpace: 'pre-line', marginTop: 6, border: '1px solid #174080' }}>
                     {tvState.channelList[tvState.selectedChannelIndex]?.info || 'Нет информации'}
                   </div>
                 </div>
