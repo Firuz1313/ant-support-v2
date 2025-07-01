@@ -72,7 +72,7 @@ const SelectDevicePage = () => {
   };
 
   const handleDeviceSelect = (deviceId: string) => {
-    navigate(`/device/${deviceId}`);
+    navigate('/error-select');
   };
 
   return (

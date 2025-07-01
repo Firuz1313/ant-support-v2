@@ -1,0 +1,89 @@
+Openbox Gold TV & Remote Control Page — Full Design Description
+===============================================================
+
+1. GENERAL OVERVIEW
+-------------------
+- The page simulates a real TV interface and remote control for the Openbox Gold set-top box.
+- The design is modern, visually rich, and highly interactive, optimized for both desktop and mobile.
+- All interactions are performed via a virtual remote control, mimicking the real Openbox Gold remote.
+
+2. LAYOUT STRUCTURE
+-------------------
+- The main content is centered on the page, with a virtual TV screen on the left (or top on mobile) and a realistic remote control on the right (or bottom on mobile).
+- The layout uses a responsive grid/flexbox system to adapt to different screen sizes.
+- The background is a dark, gradient-rich color, giving a cinematic and immersive feel.
+
+3. TV SCREEN COMPONENT
+----------------------
+- The TV screen is a large, rounded rectangle with a thick border and shadow, simulating a real TV frame.
+- The screen displays:
+  - The main menu with app icons (e.g., Channel Editor, Settings, YouTube, IPTV, etc.), each with a unique icon and color.
+  - A channel list modal with a left panel (panel 1-5: Del, Move, Skip, Lock, Fav) and a scrollable list of channels.
+  - Channel info and a mini-preview area.
+  - A modal confirmation window for deleting channels, centered on the TV, with "Cancel" and "Delete" buttons.
+- Visual feedback (highlight, border, glow) is used to indicate selection and focus.
+- When in delete mode, selected channels show a bold red cross icon.
+- All overlays and modals use soft drop-shadows, rounded corners, and semi-transparent backgrounds.
+
+4. REMOTE CONTROL COMPONENT
+---------------------------
+- The remote is a vertical, pill-shaped block with a realistic look: gradients, shadows, and glossy highlights.
+- Buttons are grouped and styled to match the real Openbox Gold remote:
+  - Power, navigation (up/down/left/right/ok), numbers, function keys, colored buttons, etc.
+  - Each button has a unique color, shape, and icon/label.
+  - Pressed state is shown with a shadow and slight movement.
+- All user actions (navigation, selection, exit, etc.) are performed by clicking/tapping the virtual remote buttons.
+- No keyboard or mouse navigation is used for TV control.
+
+5. INTERACTIONS & LOGIC
+-----------------------
+- All navigation and actions are handled via the remote; the TV screen responds visually to remote events.
+- Panel 1-5 (Del, Move, Skip, Lock, Fav) can be activated by clicking the corresponding remote button or the on-screen panel.
+- In delete mode, channels can be selected for deletion; confirmation is required via a modal.
+- Exiting from modals or modes is always done via the Exit button on the remote.
+- All state and logic are managed via React Context API.
+
+6. VISUAL STYLE
+---------------
+- Color palette: deep blues, purples, blacks, with accent colors for buttons and highlights (yellow, red, green, etc.).
+- Typography: modern, sans-serif, with clear hierarchy and strong contrast.
+- Icons: react-icons library, with custom SVGs for special states (e.g., red cross for delete).
+- Animations: smooth transitions for focus, selection, modal appearance, and button presses.
+- Shadows and gradients are used extensively for depth and realism.
+
+7. RESPONSIVENESS
+-----------------
+- The layout adapts for mobile: TV and remote stack vertically, touch targets are enlarged, and spacing is increased.
+- All components remain fully functional and visually consistent on any device.
+
+8. TECHNOLOGIES & LIBRARIES
+---------------------------
+- React + TypeScript
+- Tailwind CSS for utility-first styling
+- CSS-in-JS for dynamic styles
+- react-icons for iconography
+- Vite for build tooling
+- Context API for state management
+- No keyboard event handling for TV control (only remote)
+
+9. COMPONENTS & FILE STRUCTURE
+------------------------------
+- src/components/TVScreen.tsx — TV screen UI and logic
+- src/components/RemoteControl.tsx — Virtual remote control
+- src/context/TVControlContext.tsx — State and command logic
+- src/pages/DeviceRemotePage.tsx — Main page composition
+- src/components/ui/ — Reusable UI primitives (modals, buttons, etc.)
+
+10. UX PRINCIPLES
+-----------------
+- All actions are explicit and visually confirmed.
+- Only one main TV+remote block is present on the page.
+- All feedback is immediate and visually clear.
+- The interface is intuitive for users familiar with real TV remotes.
+
+11. EXTENSIBILITY
+-----------------
+- The design and logic are modular, allowing for easy addition of new features, apps, or remote layouts.
+
+---
+This description is sufficient to recreate the Openbox Gold TV & Remote Control page from scratch, pixel-perfect and functionally identical. 

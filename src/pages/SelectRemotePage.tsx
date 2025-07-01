@@ -167,14 +167,14 @@ export default function SelectRemotePage() {
               <a href="/devices" style={{ color: "#fff", opacity: 0.9, fontWeight: 500, textDecoration: "none" }}>Приставки</a>
               <a href="/support" style={{ color: "#fff", opacity: 0.9, fontWeight: 500, textDecoration: "none" }}>Поддержка</a>
             </nav>
-          </div>
+                    </div>
           <div style={{ display: "flex", gap: 10, marginRight: 32 }}>
             <button style={{ background: "#2563eb", color: "#fff", border: 0, borderRadius: 16, padding: "6px 18px", fontWeight: 600, marginLeft: 4 }}>OpenBOX</button>
             <button style={{ background: "#2563eb", color: "#fff", border: 0, borderRadius: 16, padding: "6px 18px", fontWeight: 600, marginLeft: 4 }}>OpenBOX GOLD</button>
             <button style={{ background: "#2563eb", color: "#fff", border: 0, borderRadius: 16, padding: "6px 18px", fontWeight: 600, marginLeft: 4 }}>Uclan</button>
             <button style={{ background: "#2563eb", color: "#fff", border: 0, borderRadius: 16, padding: "6px 18px", fontWeight: 600, marginLeft: 4 }}>HDBox</button>
-          </div>
-        </div>
+                    </div>
+                  </div>
         {/* Контент */}
         <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", gap: 48, marginTop: 48, paddingBottom: 48 }}>
           {/* Карточка приставки */}
@@ -184,8 +184,8 @@ export default function SelectRemotePage() {
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ width: 10, height: 10, background: "#22c55e", borderRadius: 5, display: "inline-block" }} />
               <span style={{ fontSize: 14, color: "#a7f3d0" }}>Подключено</span>
-            </div>
-          </div>
+                    </div>
+                      </div>
           {/* Телевизор */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <TVScreen panelBtnFromRemote={panelBtnFromRemote} />

@@ -31,8 +31,10 @@ const apps = [
 ];
 
 export default function TVScreen({ panelBtnFromRemote }: { panelBtnFromRemote?: number | null }) {
-  const { tvState } = useTVControl();
+  const { tvState, sendCommand } = useTVControl();
   const [activePanelBtn, setActivePanelBtn] = useState<number | null>(null);
+  const [channelsToDelete, setChannelsToDelete] = useState<Set<number>>(new Set());
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   React.useEffect(() => {
     if (panelBtnFromRemote && tvState.channelListOpen) {
@@ -40,16 +42,21 @@ export default function TVScreen({ panelBtnFromRemote }: { panelBtnFromRemote?: 
     }
   }, [panelBtnFromRemote, tvState.channelListOpen]);
 
+  // Сброс выбранных каналов при выходе из режима удаления
   React.useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (!tvState.channelListOpen) return;
-      if (["1", "2", "3", "4", "5"].includes(e.key)) {
-        setActivePanelBtn(Number(e.key));
-      }
+    if (activePanelBtn !== 1) setChannelsToDelete(new Set());
+  }, [activePanelBtn]);
+
+  // Обработчик выбора канала для удаления
+  function handleChannelClick(idx: number) {
+    if (activePanelBtn === 1) {
+      setChannelsToDelete(prev => {
+        const next = new Set(prev);
+        if (next.has(idx)) next.delete(idx); else next.add(idx);
+        return next;
+      });
     }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [tvState.channelListOpen]);
+  }
 
   function handlePanelBtnClick(idx: number) {
     setActivePanelBtn(idx + 1);
@@ -58,6 +65,37 @@ export default function TVScreen({ panelBtnFromRemote }: { panelBtnFromRemote?: 
   const now = new Date();
   const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '/');
   const timeStr = now.toTimeString().slice(0, 5);
+
+  // Обработка нажатия Exit с виртуального пульта
+  React.useEffect(() => {
+    function onVirtualExit() {
+      if (showDeleteModal) {
+        handleDeleteCancel();
+        return;
+      }
+      if (activePanelBtn === 1 && channelsToDelete.size > 0) {
+        setShowDeleteModal(true);
+      }
+    }
+    window.addEventListener('virtual-remote-exit', onVirtualExit);
+    return () => window.removeEventListener('virtual-remote-exit', onVirtualExit);
+  }, [activePanelBtn, channelsToDelete, showDeleteModal]);
+
+  function handleDeleteConfirm() {
+    // Здесь будет логика удаления каналов
+    setShowDeleteModal(false);
+    setChannelsToDelete(new Set());
+    // После удаления — выход на главный экран
+    sendCommand('exit'); // Закрыть список каналов
+    setTimeout(() => sendCommand('exit'), 100); // Закрыть редактор, если нужно
+  }
+  function handleDeleteCancel() {
+    setShowDeleteModal(false);
+    setChannelsToDelete(new Set());
+    // После отмены — выход на главный экран
+    sendCommand('exit'); // Закрыть список каналов
+    setTimeout(() => sendCommand('exit'), 100); // Закрыть редактор, если нужно
+  }
 
   return (
     <div
@@ -193,11 +231,32 @@ export default function TVScreen({ panelBtnFromRemote }: { panelBtnFromRemote?: 
                           textOverflow: 'ellipsis',
                           width: 180,
                           transition: 'background 0.15s',
-                          cursor: 'pointer',
+                          cursor: activePanelBtn === 1 ? 'pointer' : 'default',
+                          position: 'relative',
                         }}
+                        onClick={() => handleChannelClick(idx)}
                       >
                         <span style={{ width: 18, display: 'inline-block', textAlign: 'right', marginRight: 6 }}>{idx + 1}</span>
-                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: 155, display: 'inline-block' }}>{ch.name}</span>
+                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: 140, display: 'inline-block' }}>{ch.name}</span>
+                        {/* Красный глянцевый крестик для выбранных каналов */}
+                        {activePanelBtn === 1 && channelsToDelete.has(idx) && (
+                          <span style={{
+                            position: 'absolute',
+                            right: 8,
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            width: 10,
+                            height: 10,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                            <svg width="10" height="10" viewBox="0 0 10 10">
+                              <line x1="2" y1="2" x2="8" y2="8" stroke="#ff1744" strokeWidth="3.5" strokeLinecap="round" />
+                              <line x1="8" y1="2" x2="2" y2="8" stroke="#ff1744" strokeWidth="3.5" strokeLinecap="round" />
+                            </svg>
+                          </span>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -329,6 +388,48 @@ export default function TVScreen({ panelBtnFromRemote }: { panelBtnFromRemote?: 
       </div>
       {/* Подставка телевизора */}
       <div style={{ position: "absolute", bottom: -28, left: "50%", transform: "translateX(-50%)", width: 140, height: 18, background: "#23272e", borderRadius: 9, boxShadow: "0 4px 16px #0008" }} />
+      {/* Модальное окно подтверждения удаления */}
+      {showDeleteModal && (
+        <div style={{
+          position: 'absolute',
+          left: 0, right: 0, top: 0, bottom: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 100,
+          background: 'rgba(10,20,40,0.32)',
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #23272e 60%, #181c20 100%)',
+            border: '2px solid #fff',
+            borderRadius: 14,
+            boxShadow: '0 8px 32px #000b, 0 2px 8px #2227',
+            minWidth: 320,
+            maxWidth: 380,
+            padding: '28px 32px 22px 32px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+          }}>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: 20, marginBottom: 10, letterSpacing: 0.5 }}>Подтверждение</div>
+            <div style={{ color: '#fff', fontSize: 15, marginBottom: 18, textAlign: 'center', lineHeight: 1.5 }}>
+              Удалить выбранные каналы?<br />Это действие нельзя отменить.
+            </div>
+            <div style={{ display: 'flex', gap: 18, marginTop: 8 }}>
+              <button onClick={handleDeleteCancel} style={{
+                background: 'linear-gradient(135deg, #222 60%, #444 100%)',
+                color: '#fff', border: '1.5px solid #888', borderRadius: 7,
+                fontWeight: 600, fontSize: 15, padding: '7px 22px', cursor: 'pointer',
+                boxShadow: '0 2px 8px #0004',
+                transition: 'background 0.15s',
+              }}>Отмена</button>
+              <button onClick={handleDeleteConfirm} style={{
+                background: 'linear-gradient(135deg, #ff1744 60%, #b71c1c 100%)',
+                color: '#fff', border: '1.5px solid #ff1744', borderRadius: 7,
+                fontWeight: 700, fontSize: 15, padding: '7px 22px', cursor: 'pointer',
+                boxShadow: '0 2px 12px #ff174488',
+                transition: 'background 0.15s',
+              }}>Удалить</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

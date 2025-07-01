@@ -11,47 +11,10 @@ import DeviceRemotePage from "./pages/DeviceRemotePage";
 import { TVControlProvider, useTVControl } from './context/TVControlContext';
 import TVScreen from './components/TVScreen';
 import RemoteControl from './components/RemoteControl';
+import ErrorSelectionPage from './pages/ErrorSelectionPage';
+import ErrorDetailPage from './pages/ErrorDetailPage';
 
 const queryClient = new QueryClient();
-
-function TVKeyboardHandler({ children }: { children: React.ReactNode }) {
-  const { sendCommand } = useTVControl();
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      switch (e.key) {
-        case 'ArrowUp':
-          sendCommand('up');
-          e.preventDefault();
-          break;
-        case 'ArrowDown':
-          sendCommand('down');
-          e.preventDefault();
-          break;
-        case 'ArrowLeft':
-          sendCommand('left');
-          e.preventDefault();
-          break;
-        case 'ArrowRight':
-          sendCommand('right');
-          e.preventDefault();
-          break;
-        case 'Enter':
-          sendCommand('ok');
-          e.preventDefault();
-          break;
-        case 'Escape':
-          sendCommand('exit');
-          e.preventDefault();
-          break;
-        default:
-          break;
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sendCommand]);
-  return <>{children}</>;
-}
 
 export default function App() {
   const [panelBtnFromRemote, setPanelBtnFromRemote] = useState<number | null>(null);
@@ -61,27 +24,32 @@ export default function App() {
     if (["1","2","3","4","5"].includes(key)) {
       setPanelBtnFromRemote(Number(key));
     }
+    // Пробрасываем OK
+    if (key === "ok") {
+      setPanelBtnFromRemote((prev) => prev); // триггерим rerender
+      window.dispatchEvent(new CustomEvent("virtual-remote-ok"));
+    }
   }
 
   return (
-    <TVControlProvider>
-      <TVKeyboardHandler>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/select-device" element={<SelectDevicePage />} />
-                <Route path="/device/:deviceId" element={<DeviceRemotePage />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </TVKeyboardHandler>
-    </TVControlProvider>
-  );
+  <TVControlProvider>
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/select-device" element={<SelectDevicePage />} />
+          <Route path="/device/:deviceId" element={<DeviceRemotePage panelBtnFromRemote={panelBtnFromRemote} onRemoteButton={handleRemoteButton} />} />
+          <Route path="/error-select" element={<ErrorSelectionPage />} />
+          <Route path="/error/:errorKey/:subKey?" element={<ErrorDetailPage />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+  </TVControlProvider>
+);
 }
