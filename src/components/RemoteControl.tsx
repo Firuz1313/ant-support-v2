@@ -344,7 +344,7 @@ const getButtonStyles = (btn: any, pressed: boolean) => {
   }
 };
 
-export default function RemoteControl({ onButtonClick }: { onButtonClick?: (key: string) => void }) {
+export default function RemoteControl({ onButtonClick, highlight }: { onButtonClick?: (key: string) => void, highlight?: { key?: string } }) {
   const [pressed, setPressed] = useState<string | null>(null);
   const { sendCommand } = useTVControl();
 
@@ -403,17 +403,25 @@ export default function RemoteControl({ onButtonClick }: { onButtonClick?: (key:
       
       {buttonMap.map((row, i) => (
         <div key={i} style={{ display: "flex", justifyContent: "center", gap: 4 }}>
-          {row.map((btn) => (
+          {row.map((btn) => {
+            const isHighlighted = highlight?.key === btn.key;
+            return (
             <button
               key={btn.key}
               onClick={() => handlePress(btn.key)}
-              style={getButtonStyles(btn, pressed === btn.key)}
+              style={{
+                  ...getButtonStyles(btn, pressed === btn.key),
+                  outline: isHighlighted ? '3px solid #ff1744' : undefined,
+                  boxShadow: isHighlighted ? '0 0 0 6px #ff174488, 0 0 16px 4px #ff174488' : undefined,
+                  animation: isHighlighted ? 'remote-blink 1.2s infinite alternate' : undefined,
+                  zIndex: isHighlighted ? 10 : undefined,
+              }}
               title={btn.label}
             >
               {btn.icon || (
                 <span
                   style={{
-                    fontSize: getButtonStyles(btn, false).fontSize,
+                      fontSize: getButtonStyles(btn, false).fontSize,
                     width: "100%",
                     display: "block",
                     lineHeight: 1.2,
@@ -422,15 +430,16 @@ export default function RemoteControl({ onButtonClick }: { onButtonClick?: (key:
                     padding: "0 1px",
                     boxSizing: "border-box",
                     textAlign: "center",
-                    textShadow: "0 1px 2px rgba(0,0,0,0.8)",
-                    filter: pressed === btn.key ? "brightness(0.8)" : "brightness(1)",
+                      textShadow: "0 1px 2px rgba(0,0,0,0.8)",
+                      filter: pressed === btn.key ? "brightness(0.8)" : "brightness(1)",
                   }}
                 >
                   {btn.label}
                 </span>
               )}
             </button>
-          ))}
+            );
+          })}
         </div>
       ))}
       
@@ -456,3 +465,5 @@ export default function RemoteControl({ onButtonClick }: { onButtonClick?: (key:
     </div>
   );
 } 
+
+// @keyframes remote-blink { 0% { box-shadow: 0 0 0 6px #ff174400, 0 0 16px 4px #ff174400; } 100% { box-shadow: 0 0 0 6px #ff174488, 0 0 16px 4px #ff174488; } } 

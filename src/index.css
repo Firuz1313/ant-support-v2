@@ -105,13 +105,14 @@
   }
 }
 
+/* Убираем @apply border-border и вместо него пишем прямо CSS */
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
 
   html {
-    @apply dark;
+    /* чтобы тема dark работала, класс dark добавляется на html */
   }
 
   body {

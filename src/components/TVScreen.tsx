@@ -30,7 +30,7 @@ const apps = [
   { name: "Информация", icon: <MdInfo color="#fff" size={28} /> },
 ];
 
-export default function TVScreen({ panelBtnFromRemote }: { panelBtnFromRemote?: number | null }) {
+export default function TVScreen({ panelBtnFromRemote, highlight }: { panelBtnFromRemote?: number | null, highlight?: any }) {
   const { tvState, sendCommand } = useTVControl();
   const [activePanelBtn, setActivePanelBtn] = useState<number | null>(null);
   const [channelsToDelete, setChannelsToDelete] = useState<Set<number>>(new Set());
@@ -96,6 +96,9 @@ export default function TVScreen({ panelBtnFromRemote }: { panelBtnFromRemote?: 
     sendCommand('exit'); // Закрыть список каналов
     setTimeout(() => sendCommand('exit'), 100); // Закрыть редактор, если нужно
   }
+
+  // Новая подсказка для редактора каналов
+  const showChannelEditorHint = highlight && highlight.step === 0 && highlight.errorKey === 'channel-editor' && highlight.subKey === 'delete';
 
   return (
     <div
@@ -330,27 +333,41 @@ export default function TVScreen({ panelBtnFromRemote }: { panelBtnFromRemote?: 
           flexDirection: 'column',
           alignItems: 'stretch',
         }}>
-          {CHANNEL_EDITOR_ITEMS_LIST.map((item, idx) => (
-            <div
-              key={item}
-              style={{
-                background: idx === tvState.channelEditorIndex ? '#e048b1' : 'transparent',
-                color: idx === tvState.channelEditorIndex ? '#fff' : '#fff',
-                fontWeight: idx === tvState.channelEditorIndex ? 700 : 400,
-                fontSize: 14,
-                padding: '7px 16px',
-                borderRadius: 7,
-                margin: '2px 7px',
-                transition: 'background 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                letterSpacing: 0.2,
-              }}
-            >
-              {item}
-            </div>
-          ))}
+          {CHANNEL_EDITOR_ITEMS_LIST.map((item, idx) => {
+            // Жёлтая рамка для 'Удалить все' на шаге 2
+            const isDeleteAll = item.toLowerCase().includes('удалить');
+            const showYellow = highlight && highlight.step === 1 && highlight.key === 'delete-all' && isDeleteAll;
+            return (
+              <div
+                key={item}
+                style={{
+                  background: idx === tvState.channelEditorIndex ? '#e048b1' : 'transparent',
+                  color: idx === tvState.channelEditorIndex ? '#fff' : '#fff',
+                  fontWeight: idx === tvState.channelEditorIndex ? 700 : 400,
+                  fontSize: 14,
+                  padding: '7px 16px',
+                  borderRadius: 7,
+                  margin: '2px 7px',
+                  transition: 'background 0.2s, box-shadow 0.2s, border 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  letterSpacing: 0.2,
+                  border: showYellow ? '2.5px solid #ffd600' : undefined,
+                  boxShadow: showYellow ? '0 0 16px 2px #ffd60088, 0 2px 8px #ffd60055' : undefined,
+                  animation: showYellow ? 'yellow-blink 1.1s infinite alternate' : undefined,
+                }}
+              >
+                {item}
+              </div>
+            );
+          })}
+          <style>{`
+            @keyframes yellow-blink {
+              0% { box-shadow: 0 0 16px 2px #ffd60088, 0 2px 8px #ffd60055; border-color: #ffd600; }
+              100% { box-shadow: 0 0 32px 8px #ffd600cc, 0 2px 16px #ffd60099; border-color: #fffde7; }
+            }
+          `}</style>
         </div>
       )}
       <div style={{
@@ -373,12 +390,16 @@ export default function TVScreen({ panelBtnFromRemote }: { panelBtnFromRemote?: 
               alignItems: "center",
               color: "#fff",
               position: 'relative',
-              boxShadow: tvState.selectedIcon === i ? '0 0 0 3px #e048b1, 0 0 16px 2px #e048b1aa' : undefined,
               border: tvState.selectedIcon === i ? '2px solid #fff' : '2px solid transparent',
               borderRadius: 12,
               transition: 'box-shadow 0.2s, border 0.2s',
               zIndex: tvState.selectedIcon === i ? 2 : 1,
               background: tvState.selectedIcon === i ? 'rgba(255,255,255,0.06)' : undefined,
+              outline: highlight?.type === 'menu' && highlight?.key === 'channel-editor' && app.name === 'Редактор каналов' ? '3px solid #ffd600' : undefined,
+              boxShadow: (
+                (tvState.selectedIcon === i ? '0 0 0 3px #e048b1, 0 0 16px 2px #e048b1aa' : '') +
+                (highlight?.type === 'menu' && highlight?.key === 'channel-editor' && app.name === 'Редактор каналов' ? ', 0 0 16px 4px #ffd60088' : '')
+              ) || undefined,
             }}
           >
             {React.cloneElement(app.icon, { size: 36 })}
