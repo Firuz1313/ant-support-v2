@@ -5,6 +5,7 @@ import NotFound from "./NotFound";
 import React, { useState } from 'react';
 import ErrorSelectionPage from './ErrorSelectionPage';
 import ErrorDetailPage from './ErrorDetailPage';
+import { useIsMobile } from '../hooks/use-mobile';
 
 const devices = [
   {
@@ -34,6 +35,19 @@ export default function DeviceRemotePage({ panelBtnFromRemote, onRemoteButton }:
   const selectedDevice = devices.find((d) => d.id === deviceId);
   const [localPanelBtn, setLocalPanelBtn] = useState<number | null>(null);
   const [selectedForDelete, setSelectedForDelete] = useState<Set<number>>(new Set());
+  const isMobile = useIsMobile();
+  // Адаптивные размеры ТВ
+  let tvWidth = 900;
+  let tvHeight = 480;
+  if (typeof window !== 'undefined') {
+    if (isMobile) {
+      tvWidth = Math.min(window.innerWidth * 0.98, 420);
+      tvHeight = tvWidth * (480 / 900);
+    } else {
+      tvWidth = Math.min(900, window.innerWidth * 0.7);
+      tvHeight = tvWidth * (480 / 900);
+    }
+  }
 
   React.useEffect(() => {
     if (panelBtnFromRemote) setLocalPanelBtn(panelBtnFromRemote);
@@ -85,9 +99,9 @@ export default function DeviceRemotePage({ panelBtnFromRemote, onRemoteButton }:
           </div>
         </div>
       {/* Один комплект ТВ и пульта в основном контенте */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', gap: 48, marginTop: 48, paddingBottom: 48 }}>
-        <TVScreen panelBtnFromRemote={localPanelBtn} />
-        <RemoteControl onButtonClick={handleRemoteButton} />
+      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', alignItems: isMobile ? 'center' : 'flex-start', gap: isMobile ? 24 : 48, marginTop: isMobile ? 24 : 48, paddingBottom: isMobile ? 24 : 48, width: '100%' }}>
+        <TVScreen panelBtnFromRemote={localPanelBtn} width={tvWidth} height={tvHeight} />
+        {!isMobile && <RemoteControl onButtonClick={handleRemoteButton} />}
       </div>
       <Routes>
         <Route path="/error-select" element={<ErrorSelectionPage />} />

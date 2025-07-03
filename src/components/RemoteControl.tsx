@@ -103,246 +103,59 @@ const getButtonStyles = (btn: any, pressed: boolean) => {
     transition: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
     position: "relative" as const,
     border: "none",
-    fontWeight: 600,
-  };
-
-  const getSize = () => {
-    if (btn.big) return { width: 26, height: 26 };
-    if (["ZOOM", "GOTO", "PAUSE", "TV/R", "IPTV", "FAV", "EPG", "Prev", "Play", "Next", "Stop", "Back", "Pause", "Forward", "Record"].includes(btn.label)) {
-      return { width: 14, height: 13 };
-    }
-    return { width: 18, height: 18 };
-  };
-
-  const getBorderRadius = () => {
-    if (["SAT", "RECALL", "INFO", "Audio", "Exit", "Menu"].includes(btn.label)) return "50%";
-    if (btn.big) return "13px";
-    return "8px";
-  };
-
-  const getFontSize = () => {
-    if (["Menu", "Audio", "INFO", "SAT", "RECALL", "IPTV", "FAV", "EPG", "ZOOM", "GOTO", "PAUSE", "TV/R", "Prev", "Play", "Next", "Stop", "Back", "Pause", "Forward", "Record"].includes(btn.label)) {
-      return 5;
-    }
-    if (["VOL-", "VOL+", "CH-", "CH+", "SUBTL", "TXT", "Menu", "Exit", "SAT", "IPTV", "YouTube", "FAV", "EPG", "ZOOM"].includes(btn.label)) {
-      return 6.5;
-    }
-    if (btn.big) return 11;
-    return 8.5;
-  };
-
-  const size = getSize();
-  const borderRadius = getBorderRadius();
-  const fontSize = getFontSize();
-
-  switch (btn.type) {
-    case "power":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed 
-          ? "linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%)"
-          : "linear-gradient(135deg, #f44336 0%, #d32f2f 100%)",
-        color: "#fff",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 2px 8px rgba(244, 67, 54, 0.3), 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "1px solid #b71c1c",
-      };
-
-    case "colored":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed
-          ? `linear-gradient(135deg, ${btn.color}dd 0%, ${btn.color}aa 100%)`
-          : `linear-gradient(135deg, ${btn.color} 0%, ${btn.color}dd 100%)`,
-        color: "#fff",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : `0 2px 8px ${btn.color}40, 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)`,
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: `1px solid ${btn.color}aa`,
-      };
-
-    case "media":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed
-          ? "linear-gradient(135deg, #424242 0%, #303030 100%)"
-          : "linear-gradient(135deg, #616161 0%, #424242 100%)",
-        color: "#fff",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 2px 6px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "1px solid #424242",
-      };
-
-    case "app":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed
-          ? "linear-gradient(135deg, #2c3e50 0%, #34495e 100%)"
-          : "linear-gradient(135deg, #34495e 0%, #2c3e50 100%)",
-        color: "#ecf0f1",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 2px 6px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "1px solid #2c3e50",
-      };
-
-    case "nav":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed
-          ? "linear-gradient(135deg, #37474f 0%, #263238 100%)"
-          : "linear-gradient(135deg, #455a64 0%, #37474f 100%)",
-        color: "#fff",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 2px 6px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "1px solid #37474f",
-      };
-
-    case "ok":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed
-          ? "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)"
-          : "linear-gradient(135deg, #2196f3 0%, #1976d2 100%)",
-        color: "#fff",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 3px 12px rgba(33, 150, 243, 0.4), 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "2px solid #1976d2",
         fontWeight: 700,
-      };
-
-    case "volume":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed
-          ? "linear-gradient(135deg, #388e3c 0%, #2e7d32 100%)"
-          : "linear-gradient(135deg, #4caf50 0%, #388e3c 100%)",
-        color: "#fff",
+    fontSize: 11,
+    color: '#fff',
         boxShadow: pressed
           ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 2px 8px rgba(76, 175, 80, 0.3), 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "1px solid #388e3c",
-      };
-
-    case "channel":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
+      : "0 2px 8px #0002, 0 1px 2px #0001",
         background: pressed
-          ? "linear-gradient(135deg, #ff9800 0%, #f57c00 100%)"
-          : "linear-gradient(135deg, #ffb74d 0%, #ff9800 100%)",
-        color: "#fff",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 2px 8px rgba(255, 152, 0, 0.3), 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "1px solid #f57c00",
-      };
-
-    case "number":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed
-          ? "linear-gradient(135deg, #424242 0%, #303030 100%)"
-          : "linear-gradient(135deg, #616161 0%, #424242 100%)",
-        color: "#fff",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 2px 6px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "1px solid #424242",
-        fontWeight: 700,
-      };
-
-    case "function":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed
-          ? "linear-gradient(135deg, #5d4037 0%, #4e342e 100%)"
-          : "linear-gradient(135deg, #795548 0%, #5d4037 100%)",
-        color: "#fff",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 2px 6px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "1px solid #5d4037",
-      };
-
-    case "round":
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed
-          ? "linear-gradient(135deg, #546e7a 0%, #455a64 100%)"
-          : "linear-gradient(135deg, #78909c 0%, #546e7a 100%)",
-        color: "#fff",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 2px 6px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "1px solid #546e7a",
-      };
-
-    default:
-      return {
-        ...baseStyles,
-        ...size,
-        borderRadius,
-        fontSize,
-        background: pressed
-          ? "linear-gradient(135deg, #424242 0%, #303030 100%)"
-          : "linear-gradient(135deg, #616161 0%, #424242 100%)",
-        color: "#fff",
-        boxShadow: pressed
-          ? "inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)"
-          : "0 2px 6px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-        transform: pressed ? "translateY(1px)" : "translateY(0)",
-        border: "1px solid #424242",
-      };
+      ? "linear-gradient(135deg, #23272e 0%, #181c20 100%)"
+      : "linear-gradient(135deg, #2d2d2d 0%, #23272e 100%)",
+    margin: 0,
+    padding: 0,
+  };
+  let borderRadius = 8;
+  let width = 38, height = 22;
+  let fontSize = 8;
+  let background = baseStyles.background;
+  // Круглые кнопки: Menu, Exit, Audio, Info, Sat, Recall
+  const roundLabels = ["Menu", "Exit", "Audio", "INFO", "SAT", "RECALL"];
+  if (roundLabels.includes(btn.label)) { width = 26; height = 26; borderRadius = 13; fontSize = 7; }
+  if (btn.label === 'RECALL') fontSize = 5;
+  // OK кнопка — крупная овальная
+  if (btn.type === 'ok') { width = 48; height = 28; borderRadius = 14; fontSize = 12; }
+  // Цветные кнопки
+  if (btn.type === 'colored') {
+    background = pressed
+      ? `linear-gradient(135deg, ${btn.color}cc 0%, ${btn.color}99 100%)`
+      : `linear-gradient(135deg, ${btn.color} 0%, ${btn.color}cc 100%)`;
+  } else if (!roundLabels.includes(btn.label) && btn.type !== 'ok') {
+    background = pressed
+      ? 'linear-gradient(135deg, #23272e 0%, #181c20 100%)'
+      : 'linear-gradient(135deg, #23272e 0%, #181c20 100%)';
   }
+  // Современный box-shadow и плавный hover/active для всех
+  const boxShadow = pressed
+    ? '0 1px 4px #0008, 0 0 0 2px #00eaff44 inset'
+    : '0 2px 8px #0003, 0 1px 2px #0002, 0 0 0 1.5px #fff1 inset';
+  return {
+    ...baseStyles,
+    borderRadius,
+    background,
+    width,
+    height,
+    fontSize,
+    boxShadow,
+    border: btn.type === 'colored' ? `2px solid ${btn.color}` : '1.5px solid #222',
+    _fontSize: fontSize,
+  };
 };
+
+const REMOTE_WIDTH = 150;
+const REMOTE_HEIGHT = 490;
+const ICON_SIZE = 10;
+const BUTTON_SIZE = 20;
 
 export default function RemoteControl({ onButtonClick, highlight }: { onButtonClick?: (key: string) => void, highlight?: { key?: string } }) {
   const [pressed, setPressed] = useState<string | null>(null);
@@ -376,72 +189,71 @@ export default function RemoteControl({ onButtonClick, highlight }: { onButtonCl
   return (
     <div
       style={{
-        width: 90,
-        background: "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%)",
-        borderRadius: 22,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)",
-        padding: 12,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 6,
-        border: "2px solid #333",
-        position: "relative",
+        width: REMOTE_WIDTH,
+        minWidth: 160,
+        maxWidth: '100vw',
+        height: REMOTE_HEIGHT,
+        background: '#23272e',
+        borderRadius: 28,
+        boxShadow: '0 4px 32px #000a',
+        padding: 18,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4,
+        overflow: 'hidden',
+        position: 'relative',
+        boxSizing: 'border-box',
       }}
     >
-      {/* Добавляем блик на корпус пульта */}
-      <div style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        height: "50%",
-        background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)",
-        borderRadius: "20px 20px 0 0",
-        pointerEvents: "none",
-      }} />
-      
-      {buttonMap.map((row, i) => (
-        <div key={i} style={{ display: "flex", justifyContent: "center", gap: 4 }}>
-          {row.map((btn) => {
+      {buttonMap.map((row, rowIdx) => {
+        // Ряды, которым нужен особый горизонтальный gap (1-3, 4-6, 7-9, SUBTL-0-TXT)
+        const digitRows = [9, 10, 11, 12];
+        const isDigitRow = digitRows.includes(rowIdx);
+        // Ряды, которым нужен особый отступ (space-between)
+        const spacedRows = [5, 6, 7, 8, 9, 10, 11, 12];
+        const isSpaced = spacedRows.includes(rowIdx);
+        return (
+          <div
+            key={rowIdx}
+            style={{
+              display: 'flex',
+              gap: isDigitRow ? 8 : (isSpaced ? 0 : 4),
+              marginBottom: 2,
+              justifyContent: isSpaced ? 'space-between' : 'center',
+              width: '100%',
+              padding: isSpaced ? '0 8px' : 0,
+            }}
+          >
+            {row.map((btn, btnIdx) => {
             const isHighlighted = highlight?.key === btn.key;
+              const btnStyles = getButtonStyles(btn, pressed === btn.key);
+              // Для крайних кнопок в spacedRows добавим margin
+              let extraStyle = {};
+              if (isSpaced && btnIdx === 0) extraStyle = { marginLeft: 2 };
+              if (isSpaced && btnIdx === row.length - 1) extraStyle = { marginRight: 2 };
             return (
             <button
               key={btn.key}
               onClick={() => handlePress(btn.key)}
               style={{
-                  ...getButtonStyles(btn, pressed === btn.key),
-                  outline: isHighlighted ? '3px solid #ff1744' : undefined,
-                  boxShadow: isHighlighted ? '0 0 0 6px #ff174488, 0 0 16px 4px #ff174488' : undefined,
-                  animation: isHighlighted ? 'remote-blink 1.2s infinite alternate' : undefined,
-                  zIndex: isHighlighted ? 10 : undefined,
+                    ...btnStyles,
+                    ...extraStyle,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'background 0.18s, box-shadow 0.18s',
               }}
               title={btn.label}
             >
-              {btn.icon || (
-                <span
-                  style={{
-                      fontSize: getButtonStyles(btn, false).fontSize,
-                    width: "100%",
-                    display: "block",
-                    lineHeight: 1.2,
-                    fontWeight: 600,
-                    letterSpacing: 0.3,
-                    padding: "0 1px",
-                    boxSizing: "border-box",
-                    textAlign: "center",
-                      textShadow: "0 1px 2px rgba(0,0,0,0.8)",
-                      filter: pressed === btn.key ? "brightness(0.8)" : "brightness(1)",
-                  }}
-                >
-                  {btn.label}
-                </span>
-              )}
+                  {btn.icon ? React.cloneElement(btn.icon, { size: btnStyles._fontSize }) : <span style={{fontSize: btnStyles._fontSize, fontWeight: 700, color: '#fff'}}>{btn.label}</span>}
             </button>
             );
           })}
         </div>
-      ))}
+        );
+      })}
       
       {/* Улучшенный логотип */}
       <div style={{ 
